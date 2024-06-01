@@ -1,0 +1,27 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "clock-in-clock-out-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/clockInClockOut/ClockInClockOutWebPart.js",
+          "manifest": "./src/webparts/clockInClockOut/ClockInClockOutWebPart.manifest.json"
+        }
+      ]
+    },
+    "dash-board-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/dashBoard/DashBoardWebPart.js",
+          "manifest": "./src/webparts/dashBoard/DashBoardWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "ClockInClockOutWebPartStrings": "lib/webparts/clockInClockOut/loc/{locale}.js",
+    "DashBoardWebPartStrings": "lib/webparts/dashBoard/loc/{locale}.js"
+  }
+}

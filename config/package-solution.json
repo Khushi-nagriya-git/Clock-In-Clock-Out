@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "clock-in-clock-out-client-side-solution",
+    "id": "4be5f900-2f8c-4b2a-8d3d-a641cd64f59c",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.18.2"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "clock-in-clock-out description"
+      },
+      "longDescription": {
+        "default": "clock-in-clock-out description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "clock-in-clock-out Feature",
+        "description": "The feature that activates elements of the clock-in-clock-out solution.",
+        "id": "4112d87f-1f38-4065-a692-a6f3ac3045c0",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/clock-in-clock-out.sppkg"
+  }
+}
