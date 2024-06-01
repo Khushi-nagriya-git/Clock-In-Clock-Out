@@ -50,7 +50,7 @@ const DetailRecords: React.FC<IDashBoardProps> = (props) => {
         if (data.value.length > 0) {
           setUserRecords(data.value[0]);
         } else {
-          console.log("No data found");
+          console.log("No data found khu");
         }
       } else {
         console.log("Please enter the correct name of the list in the property pane.");
