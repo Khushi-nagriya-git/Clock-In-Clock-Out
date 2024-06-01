@@ -53,7 +53,7 @@ const DetailRecords: React.FC<IDashBoardProps> = (props) => {
           console.log("No data found");
         }
       } else {
-        console.log("Please enter the correct name of the khushi list in the property pane.");
+        console.log("Please enter the correct name of the list in the property pane.");
       }
     } catch (error) {
       console.log("Error fetching data:", error);
