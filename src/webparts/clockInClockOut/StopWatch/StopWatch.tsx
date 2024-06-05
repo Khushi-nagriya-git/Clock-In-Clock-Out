@@ -206,7 +206,8 @@ const StopWatch: React.FunctionComponent<IStopWatchProps> = (
               currentUserRecord.Date = currentDate;
               currentUserRecord.Status = "IN";
               currentUserRecord.TodayFirstIn = startTime;
-              currentUserRecord[currentMonthName]=userRecord;
+              if(currentUserRecord[currentMonthName] === null){currentUserRecord[currentMonthName]=userRecord}else{ currentUserRecord[currentMonthName].push(...userRecord)}
+              // currentUserRecord[currentMonthName].push(...userRecord)
               await updateUserRecords(
                 props.spHttpClient,
                 props.absoluteURL,

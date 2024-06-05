@@ -68,14 +68,15 @@ const Admin: React.FC<IDashBoardProps> = (props) => {
               <TableCell align="center">First IN</TableCell>
               <TableCell align="center">Last OUT</TableCell>
               <TableCell align="center">Total Time</TableCell>
+              <TableCell align="center">Details</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {userData.map((index: any) => (
               <TableRow
                 key={index.EmployeeID}
-                onClick={() => handleRowClick(index.EmployeeID)}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 }, cursor: 'pointer' }}
+                // onClick={() => handleRowClick(index.EmployeeID)}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
               >
                 <TableCell align="center">{index.EmployeeName}</TableCell>
                 <TableCell align="center">{index.Date}</TableCell>
@@ -83,6 +84,11 @@ const Admin: React.FC<IDashBoardProps> = (props) => {
                 <TableCell align="center">{index.TodayFirstIn}</TableCell>
                 <TableCell align="center">{index.TodayLastOut}</TableCell>
                 <TableCell align="center">{totalTime(index.TodayTotalTime)}</TableCell>
+                <TableCell align="center">
+                    <IconButton aria-label="Detail Logs">
+                      <img src={require("../../assets/eye.png")} alt="Timer Button" onClick={() => handleRowClick(index.EmployeeID)} style={{ width: 30, height: 30, cursor: 'pointer' }} />
+                    </IconButton>
+                  </TableCell>
               </TableRow>
             ))}
           </TableBody>

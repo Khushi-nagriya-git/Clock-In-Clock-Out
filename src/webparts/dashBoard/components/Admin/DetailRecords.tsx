@@ -34,7 +34,6 @@ const DetailRecords: React.FC<IDashBoardProps> = (props) => {
   const [Logs, setLogs] = useState<InOutDetail[]>(initialState.inOutDetail);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [logPage, setLogPage] = useState(0);
   const currentMonth = new Date().getMonth();
   const [dialogPage, setDialogPage] = useState(0);
   const [dialogRowsPerPage, setDialogRowsPerPage] = useState(5);
@@ -105,14 +104,12 @@ const DetailRecords: React.FC<IDashBoardProps> = (props) => {
     for (const record of monthRecords) {
       if (Object.keys(record)[0] === key) {
         setLogs(record[key].inOutDetails);
-        setLogPage(0);
-        console.log(Logs)
         break;
       }
     }
   }
 
-  const BootstrapDialog = styled(Dialog)(({ theme }) => ({
+  const DialogBox = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
       padding: theme.spacing(2),
     },
@@ -147,38 +144,41 @@ const DetailRecords: React.FC<IDashBoardProps> = (props) => {
 
   return (
     <React.Fragment>
-      <Grid container spacing={2} alignItems="center">
-        <Grid item>
-          <Avatar {...stringAvatar(`${userRecords.EmployeeName}`)} />
-        </Grid>
-        <Grid item>
-          <Typography variant="h6" component="h6">
-            {userRecords.EmployeeName}
-          </Typography>
-        </Grid>
+    <Grid container spacing={2} alignItems="center">
+      <Grid item>
+        <Avatar {...stringAvatar(`${userRecords.EmployeeName}`)} />
       </Grid>
-      <Grid container justifyContent="flex-end">
-        <Grid item>
-          <ButtonGroup variant="outlined" aria-label="Basic button group">
-            {Array.apply(null, { length: new Date().getMonth() + 1 })
-              .map((data, index) => new Date(0, index).toLocaleString('default', { month: 'short' }))
-              .reverse()
-              .map((month, index) => {
-                const monthIndex = new Date().getMonth() - index;
-                return (
-                  <Button
-                    key={index}
-                    onClick={() => handleMonthClick(monthIndex)}
-                    style={{ backgroundColor: selectedMonth === monthIndex ? '#1976d2' : 'transparent', color: selectedMonth === monthIndex ? 'white' : '#1976d2' }} // Highlight selected button
-                  >
-                    {month}
-                  </Button>
-                );
-              })}
-          </ButtonGroup>
-        </Grid>
+      <Grid item>
+        <Typography variant="h6" component="h6">
+          {userRecords.EmployeeName}
+        </Typography>
       </Grid>
-      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+    </Grid>
+    <Grid container justifyContent="flex-end">
+      <Grid item>
+        <ButtonGroup variant="outlined" aria-label="Basic button group">
+          {Array.apply(null, { length: new Date().getMonth() + 1 })
+            .map((data, index) => new Date(0, index).toLocaleString('default', { month: 'short' }))
+            .reverse()
+            .map((month, index) => {
+              const monthIndex = new Date().getMonth() - index;
+              return (
+                <Button
+                  key={index}
+                  onClick={() => handleMonthClick(monthIndex)}
+                  style={{ backgroundColor: selectedMonth === monthIndex ? '#1976d2' : 'transparent', color: selectedMonth === monthIndex ? 'white' : '#1976d2' }} // Highlight selected button
+                >
+                  {month}
+                </Button>
+              );
+            })}
+        </ButtonGroup>
+      </Grid>
+    </Grid>
+    {monthRecords.length === 0 ? (
+      <Typography variant="h6" component="h6"   sx={{ mt: 6, color: 'black', fontSize: '1rem', textAlign: 'center' }}>No logs available</Typography>
+    ) : (
+      <Paper sx={{ width: '100%', overflow: 'hidden', mt: 2 }}>
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
@@ -193,15 +193,15 @@ const DetailRecords: React.FC<IDashBoardProps> = (props) => {
             </TableHead>
             <TableBody>
               {monthRecords.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((record) => (
-                <TableRow key={Object.keys(record)[0]} sx={{ '&:last-child td, &:last-child th': { border: 0 }, cursor: 'pointer' }}  >
+                <TableRow key={Object.keys(record)[0]} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                   <TableCell align="center">{Object.keys(record)[0]}</TableCell>
                   <TableCell align="center">{record[Object.keys(record)[0]].status}</TableCell>
                   <TableCell align="center">{record[Object.keys(record)[0]].firstIn}</TableCell>
                   <TableCell align="center">{record[Object.keys(record)[0]].lastOut}</TableCell>
                   <TableCell align="center">{totalTime(record[Object.keys(record)[0]].todayTotalTime)}</TableCell>
                   <TableCell align="center">
-                    <IconButton aria-label="Detail Logs" onClick={function (event) { handleClickOpen(); inOutDetails(Object.keys(record)[0]) }}  >
-                      <img src={require("../../assets/list.png")} alt="Timer Button" style={{ width: 22, height: 22, cursor: 'pointer' }} />
+                    <IconButton aria-label="Detail Logs" onClick={() => { handleClickOpen(); inOutDetails(Object.keys(record)[0]); }}>
+                      <img src={require("../../assets/list.png")} style={{ width: 22, height: 22, cursor: 'pointer' }} />
                     </IconButton>
                   </TableCell>
                 </TableRow>
@@ -210,7 +210,7 @@ const DetailRecords: React.FC<IDashBoardProps> = (props) => {
           </Table>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[5, 8]}
+          rowsPerPageOptions={[5, 10]}
           component="div"
           count={monthRecords.length}
           rowsPerPage={rowsPerPage}
@@ -219,66 +219,65 @@ const DetailRecords: React.FC<IDashBoardProps> = (props) => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
-      <BootstrapDialog
-        onClose={handleClose}
-        aria-labelledby="customized-dialog-title"
-        open={open}
+    )}
+    <DialogBox
+      onClose={handleClose}
+      aria-labelledby="customized-dialog-title"
+      open={open}
+    >
+      <DialogTitle sx={{ m: 1, p: 2 }} id="customized-dialog-title">
+        Logs
+      </DialogTitle>
+      <IconButton
+        aria-label="close"
+        onClick={handleClose}
+        sx={{
+          position: 'absolute',
+          right: 8,
+          top: 8,
+          color: (theme) => theme.palette.grey[500],
+        }}
       >
-        <DialogTitle sx={{ m: 1, p: 2 }} id="customized-dialog-title">
-          Logs
-        </DialogTitle>
-        <IconButton
-          aria-label="close"
-          onClick={handleClose}
-          sx={{
-            position: 'absolute',
-            right: 8,
-            top: 8,
-            color: (theme) => theme.palette.grey[500],
+        <CloseIcon />
+      </IconButton>
+      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 500 }} aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ fontWeight: 500 }} align="center">IN</TableCell>
+                <TableCell sx={{ fontWeight: 500 }} align="center">OUT</TableCell>
+                <TableCell sx={{ fontWeight: 500 }} align="center">Total Time</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {Logs.slice(dialogPage * dialogRowsPerPage, dialogPage * dialogRowsPerPage + dialogRowsPerPage)
+                .map((record, index) => (
+                  <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                    <TableCell align="center">{formatTimeFromTimestamp(record.start)}</TableCell>
+                    <TableCell align="center">{formatTimeFromTimestamp(record.end)}</TableCell>
+                    <TableCell align="center">{totalTime(record.Total)}</TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[5]}
+          component="div"
+          count={Logs.length}
+          rowsPerPage={dialogRowsPerPage}
+          page={dialogPage}
+          onPageChange={(event, newPage) => setDialogPage(newPage)}
+          onRowsPerPageChange={(event) => {
+            setDialogRowsPerPage(parseInt(event.target.value, 10));
+            setDialogPage(0);
           }}
-        >
-          <CloseIcon />
-        </IconButton>
-        <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-          <TableContainer component={Paper} >
-            <Table sx={{ minWidth: 500 }} aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ fontWeight: 500 }} align="center">IN</TableCell>
-                  <TableCell sx={{ fontWeight: 500 }} align="center">OUT</TableCell>
-                  <TableCell sx={{ fontWeight: 500 }} align="center">Total Time</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {Logs.slice(dialogPage * dialogRowsPerPage, dialogPage * dialogRowsPerPage + dialogRowsPerPage)
-                  .map((record, index) => (
-                    <TableRow
-                      key={index}
-                      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                    >
-                      <TableCell align="center">{formatTimeFromTimestamp(record.start)}</TableCell>
-                      <TableCell align="center">{formatTimeFromTimestamp(record.end)}</TableCell>
-                      <TableCell align="center">{totalTime(record.Total)}</TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <TablePagination
-            rowsPerPageOptions={[5]}
-            component="div"
-            count={Logs.length}
-            rowsPerPage={dialogRowsPerPage}
-            page={dialogPage}
-            onPageChange={(event, newPage) => setDialogPage(newPage)}
-            onRowsPerPageChange={(event) => {
-              setDialogRowsPerPage(parseInt(event.target.value, 10));
-              setDialogPage(0);
-            }}
-          />
-        </Paper>
-      </BootstrapDialog>
-    </React.Fragment>
+        />
+      </Paper>
+    </DialogBox>
+  </React.Fragment>
+  
   );
 };
 
