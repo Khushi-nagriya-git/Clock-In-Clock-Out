@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useParams } from 'react-router-dom';
 import { IDashBoardProps } from '../IDashBoardProps';
 import { SPHttpClient } from '@microsoft/sp-http';
-import { UserData, initialState, DetailRecord, InOutDetail } from './IAdminStats';
+import { UserData, initialState, DetailRecord, InOutDetail } from '../Admin/IAdminStats';
 import { useEffect, useState } from 'react';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Button from '@mui/material/Button';
@@ -25,122 +25,169 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import CloseIcon from '@mui/icons-material/Close';
 import TablePagination from '@mui/material/TablePagination';
-const DetailRecords: React.FC<IDashBoardProps> = (props) => {
-  const { id } = useParams<{ id: string }>();
-  const { spHttpClient, absoluteURL, listName } = props;
-  const [userRecords, setUserRecords] = useState<UserData>(initialState.userData[0]);
-  const [monthRecords, setMonthRecords] = useState<DetailRecord[]>(initialState.detailRecord);
-  const [open, setOpen] = useState(false);
-  const [Logs, setLogs] = useState<InOutDetail[]>(initialState.inOutDetail);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const currentMonth = new Date().getMonth();
-  const [dialogPage, setDialogPage] = useState(0);
-  const [dialogRowsPerPage, setDialogRowsPerPage] = useState(5);
-  const [selectedMonth, setSelectedMonth] = useState(0);
-  const getEmployeeDetails = async (employeeId: string | undefined) => {
-    try {
-      const response = await spHttpClient.get(
-        `${absoluteURL}/_api/web/lists/GetByTitle('${listName}')/items?$select=EmployeeID,EmployeeName,Email,Date,Status,TodayTotalTime,TodayFirstIn,TodayLastOut,January,February,March,April,May,June,July,August,September,October,November,December&$filter=EmployeeID eq '${employeeId}'`,
-        SPHttpClient.configurations.v1
-      );
-      if (response.ok) {
-        const data = await response.json();
-        if (data.value.length > 0) {
-          setUserRecords(data.value[0]);
+import { CurrentUserDetails } from '../../../clockInClockOut/StopWatch/IStopWatchStats';
+
+const User: React.FC<IDashBoardProps> = (props) => {
+    const { spHttpClient, absoluteURL, listName } = props;
+    const [userRecords, setUserRecords] = useState<UserData>(initialState.userData[0]);
+    const [monthRecords, setMonthRecords] = useState<DetailRecord[]>(initialState.detailRecord);
+    const [open, setOpen] = useState(false);
+    const [Logs, setLogs] = useState<InOutDetail[]>(initialState.inOutDetail);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const currentMonth = new Date().getMonth();
+    const [dialogPage, setDialogPage] = useState(0);
+    const [dialogRowsPerPage, setDialogRowsPerPage] = useState(5);
+    const [selectedMonth, setSelectedMonth] = useState(currentMonth);
+    const [currentUserDetails, setCurrentUserDetails] = useState<CurrentUserDetails>({
+      Title: "",
+      Id: 0,
+      email: "",
+      groups: []
+    });
+  
+    const getCurrentUserData = async () => {
+      try {
+        const response = await spHttpClient.get(
+          `${absoluteURL}/_api/web/currentuser?$select=Title,Email,Id`,
+          SPHttpClient.configurations.v1,
+          {
+            headers: {
+              Accept: "application/json;odata=nometadata",
+              "odata-version": "",
+            },
+          }
+        );
+        if (response.ok) {
+          const responseJSON = await response.json();
+          setCurrentUserDetails(responseJSON);
         } else {
-          console.log("No data found khu");
+          console.log("No data found");
+        }
+      } catch (error) {
+        console.log("Error:", error);
+      }
+    };
+  
+    const getEmployeeDetails = async (employeeId: string | undefined) => {
+      if (!employeeId) return;
+      try {
+        const response = await spHttpClient.get(
+          `${absoluteURL}/_api/web/lists/GetByTitle('${listName}')/items?$select=EmployeeID,EmployeeName,Email,Date,Status,TodayTotalTime,TodayFirstIn,TodayLastOut,January,February,March,April,May,June,July,August,September,October,November,December&$filter=EmployeeID eq '${employeeId}'`,
+          SPHttpClient.configurations.v1
+        );
+        if (response.ok) {
+          const data = await response.json();
+          if (data.value.length > 0) {
+            setUserRecords(data.value[0]);
+          } else {
+            console.log("No data found");
+          }
+        } else {
+          console.log("Please enter the correct name of the list in the property pane.");
+        }
+      } catch (error) {
+        console.log("Error fetching data:", error);
+      }
+    };
+  
+    useEffect(() => {
+      const fetchData = async () => {
+        await getCurrentUserData();
+      };
+      fetchData();
+    }, []);
+  
+    useEffect(() => {
+      if (currentUserDetails.Id) {
+        getEmployeeDetails(currentUserDetails.Id);
+      }
+    }, [ currentUserDetails.Id]);
+  
+    useEffect(() => {
+      if (userRecords.EmployeeID) {
+        handleMonthClick(currentMonth);
+      }
+    }, [userRecords, currentMonth]);
+  
+    const handleMonthClick = (month: number) => {
+      setSelectedMonth(month);
+      const monthRecordsArray = [
+        userRecords.January,
+        userRecords.February,
+        userRecords.March,
+        userRecords.April,
+        userRecords.May,
+        userRecords.June,
+        userRecords.July,
+        userRecords.August,
+        userRecords.September,
+        userRecords.October,
+        userRecords.November,
+        userRecords.December,
+      ];
+  
+      const selectedMonthData = monthRecordsArray[month];
+      if (selectedMonthData) {
+        try {
+          const parsedData = JSON.parse(selectedMonthData) as DetailRecord[];
+          setMonthRecords(parsedData.reverse());
+          setPage(0);
+        } catch (error) {
+          console.error("Error parsing month data:", error);
+          setMonthRecords([]);
         }
       } else {
-        console.log("Please enter the correct name of the list in the property pane.");
-      }
-    } catch (error) {
-      console.log("Error fetching data:", error);
-    }
-  };
-
-  useEffect(() => {
-    if (id) {
-      getEmployeeDetails(id);
-    }
-  }, [id]);
-  useEffect(() => {
-    if (userRecords.EmployeeID) {
-      handleMonthClick(currentMonth);
-    }
-  }, [userRecords]);
-  const handleMonthClick = (month: number) => {
-    setSelectedMonth(month);
-    const monthRecordsArray = [
-      userRecords.January,
-      userRecords.February,
-      userRecords.March,
-      userRecords.April,
-      userRecords.May,
-      userRecords.June,
-      userRecords.July,
-      userRecords.August,
-      userRecords.September,
-      userRecords.October,
-      userRecords.November,
-      userRecords.December,
-    ];
-
-    const selectedMonthData = monthRecordsArray[month];
-    if (selectedMonthData) {
-      try {
-        const parsedData = JSON.parse(selectedMonthData) as DetailRecord[];
-        setMonthRecords(parsedData.reverse());
-        setPage(0);
-      } catch (error) {
-        console.error("Error parsing month data:", error);
         setMonthRecords([]);
       }
-    } else {
-      setMonthRecords([]);
-    }
-  };
-  function inOutDetails(key: string) {
-    for (const record of monthRecords) {
-      if (Object.keys(record)[0] === key) {
-        setLogs(record[key].inOutDetails);
-        break;
+    };
+  
+    function inOutDetails(key: string) {
+      for (const record of monthRecords) {
+        if (Object.keys(record)[0] === key) {
+          setLogs(record[key].inOutDetails);
+          break;
+        }
       }
     }
-  }
-
-  const DialogBox = styled(Dialog)(({ theme }) => ({
-    '& .MuiDialogContent-root': {
-      padding: theme.spacing(2),
-    },
-    '& .MuiDialogActions-root': {
-      padding: theme.spacing(1),
-    },
-  }));
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
-  function stringAvatar(name: string) {
-    const initials = name.split(' ');
-    const firstInitial = initials[0][0];
-    const secondInitial = initials.length > 1 ? initials[1][0] : '';
-    return {
-      sx: {
-        bgcolor: "#1976d2",
+  
+    const DialogBox = styled(Dialog)(({ theme }) => ({
+      '& .MuiDialogContent-root': {
+        padding: theme.spacing(2),
       },
-      children: `${firstInitial}${secondInitial}`,
+      '& .MuiDialogActions-root': {
+        padding: theme.spacing(1),
+      },
+    }));
+  
+    const handleClickOpen = () => {
+      setOpen(true);
     };
-  }
+  
+    const handleClose = () => {
+      setOpen(false);
+    };
+  
+    const handleChangePage = (event: unknown, newPage: number) => {
+      setPage(newPage);
+    };
+  
+    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+      setRowsPerPage(+event.target.value);
+      setPage(0);
+    };
+  
+    function stringAvatar(name: string) {
+      const initials = name.split(' ');
+      const firstInitial = initials[0][0];
+      const secondInitial = initials.length > 1 ? initials[1][0] : '';
+      return {
+        sx: {
+          bgcolor: "#1976d2",
+        },
+        children: `${firstInitial}${secondInitial}`,
+      };
+    }
 
   return (
     <React.Fragment>
@@ -282,4 +329,4 @@ const DetailRecords: React.FC<IDashBoardProps> = (props) => {
   );
 };
 
-export default DetailRecords;
+export default User;

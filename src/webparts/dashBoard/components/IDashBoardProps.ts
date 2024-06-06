@@ -5,4 +5,5 @@ export interface IDashBoardProps {
     absoluteURL: any;
     listName:string;
     context: WebPartContext;
+    
 }

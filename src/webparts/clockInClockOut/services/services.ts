@@ -3,7 +3,7 @@ import { SPHttpClient } from "@microsoft/sp-http";
 export const getCurrentUserData = async (spHttpClient: SPHttpClient, absoluteURL: string) => {
     try {
         const response = await spHttpClient.get(
-            `${absoluteURL}/_api/web/currentuser?$select=Title,Email,Id`,
+            `${absoluteURL}/_api/web/currentuser?$select=Title,Email,Id&$expand=groups`,
             SPHttpClient.configurations.v1,
             {
                 headers: {
@@ -40,7 +40,7 @@ export const getListData = async (
 ) => {
     try {
         const response = await spHttpClient.get(
-            `${absoluteURL}/_api/web/lists/GetByTitle('${listName}')/items?$select=EmployeeID,EmployeeName,Date,Status,TodayTotalTime,TodayFirstIn,TodayLastOut,January,February,March,April,May,June,July,August,September,October,November,December&$filter=EmployeeID eq '${currentUserDetails.Id}'`,
+            `${absoluteURL}/_api/web/lists/GetByTitle('${listName}')/items?$select=EmployeeID,EmployeeName,Email,Date,Status,TodayTotalTime,TodayFirstIn,TodayLastOut,January,February,March,April,May,June,July,August,September,October,November,December&$filter=EmployeeID eq '${currentUserDetails.Id}'`,
             SPHttpClient.configurations.v1
         );
         if (response.ok) {
@@ -108,6 +108,7 @@ export const addUserRecords = async (
     const listItemData = {
         EmployeeID: currentUserDetails.Id,
         EmployeeName: currentUserDetails.Title,
+        Email: currentUserDetails.email,
         Date: currentDate,
         Status: "IN",
         TodayTotalTime: 0,

@@ -21,6 +21,8 @@ export interface CurrentUserDetails {
     Title: string;
     Id: any;
     email: string;
+    groups:[];
+
 }
 
 export interface UserData {
@@ -38,6 +40,7 @@ export const initialCurrentUserDetails: CurrentUserDetails = {
     Title: "",
     Id: 0,
     email: "",
+    groups: []
 };
 
 export const initialUserData: UserData = {

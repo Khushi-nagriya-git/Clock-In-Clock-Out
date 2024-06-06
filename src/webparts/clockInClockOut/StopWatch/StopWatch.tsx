@@ -87,7 +87,7 @@ const StopWatch: React.FunctionComponent<IStopWatchProps> = (
 
   async function editUserDetails() {
     try {
-      const filterQuery = `$select=EmployeeID,EmployeeName,Date,Status,TodayTotalTime,TodayFirstIn,TodayLastOut,January,February,March,April,May,June,July,August,September,October,November,December`;
+      const filterQuery = `$select=EmployeeID,EmployeeName,Email,Date,Status,TodayTotalTime,TodayFirstIn,TodayLastOut,January,February,March,April,May,June,July,August,September,October,November,December`;
       const requestUrl = `${props.absoluteURL}/_api/web/lists/GetByTitle('${props.listName}')/items?${filterQuery}`;
       const response = await props.spHttpClient.get(
         requestUrl,

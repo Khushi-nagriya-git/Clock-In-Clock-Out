@@ -6,7 +6,6 @@ import { SPHttpClient } from '@microsoft/sp-http';
 import { totalTime } from "../../../clockInClockOut/StopWatch/TimeCalculation";
 import { useNavigate } from 'react-router-dom';
 import { UserData, initialState } from './IAdminStats'; // Import initialState from the correct file
-
 import {
   Box,
   Collapse,
@@ -30,7 +29,7 @@ const Admin: React.FC<IDashBoardProps> = (props) => {
   const getListData = async () => {
     try {
       const response = await spHttpClient.get(
-        `${absoluteURL}/_api/web/lists/GetByTitle('${listName}')/items?$select=EmployeeID,EmployeeName,Date,Status,TodayTotalTime,TodayFirstIn,TodayLastOut,January,February,March,April,May,June,July,August,September,October,November,December`,
+        `${absoluteURL}/_api/web/lists/GetByTitle('${listName}')/items?$select=EmployeeID,EmployeeName,Email,Date,Status,TodayTotalTime,TodayFirstIn,TodayLastOut,January,February,March,April,May,June,July,August,September,October,November,December`,
         SPHttpClient.configurations.v1
       );
       if (response.ok) {
@@ -58,24 +57,27 @@ const Admin: React.FC<IDashBoardProps> = (props) => {
 
   return (
     <div className={styles.dashBoard}>
-      <TableContainer component={Paper}>
+     <Typography variant="h6" sx={{color: 'black'}}>
+        Dashboard
+     </Typography>
+
+      <TableContainer component={Paper}sx={{mt: 3 }} >
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell align="center">Employee Name</TableCell>
-              <TableCell align="center">Date</TableCell>
-              <TableCell align="center">Status</TableCell>
-              <TableCell align="center">First IN</TableCell>
-              <TableCell align="center">Last OUT</TableCell>
-              <TableCell align="center">Total Time</TableCell>
-              <TableCell align="center">Details</TableCell>
+              <TableCell align="center" sx={{backgroundColor:"#f3f2f1"}}>Employee Name</TableCell>
+              <TableCell align="center" sx={{backgroundColor:"#f3f2f1"}}>Date</TableCell>
+              <TableCell align="center" sx={{backgroundColor:"#f3f2f1"}}>Status</TableCell>
+              <TableCell align="center" sx={{backgroundColor:"#f3f2f1"}}>First In</TableCell>
+              <TableCell align="center" sx={{backgroundColor:"#f3f2f1"}}>Last Out</TableCell>
+              <TableCell align="center" sx={{backgroundColor:"#f3f2f1"}}>Total Time</TableCell>
+              <TableCell align="center" sx={{backgroundColor:"#f3f2f1"}}>Details</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {userData.map((index: any) => (
               <TableRow
                 key={index.EmployeeID}
-                // onClick={() => handleRowClick(index.EmployeeID)}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
               >
                 <TableCell align="center">{index.EmployeeName}</TableCell>
