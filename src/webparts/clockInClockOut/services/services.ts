@@ -1,4 +1,5 @@
 import { SPHttpClient } from "@microsoft/sp-http";
+
 //This function is used to get logged in  user information
 export const getCurrentUserData = async (spHttpClient: SPHttpClient, absoluteURL: string) => {
     try {
@@ -108,7 +109,7 @@ export const addUserRecords = async (
     const listItemData = {
         EmployeeID: currentUserDetails.Id,
         EmployeeName: currentUserDetails.Title,
-        Email: currentUserDetails.email,
+        Email: currentUserDetails.Email,
         Date: currentDate,
         Status: "IN",
         TodayTotalTime: 0,

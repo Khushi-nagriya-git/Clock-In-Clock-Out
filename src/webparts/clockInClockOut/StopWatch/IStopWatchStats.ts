@@ -22,7 +22,6 @@ export interface CurrentUserDetails {
     Id: any;
     email: string;
     groups:[];
-
 }
 
 export interface UserData {

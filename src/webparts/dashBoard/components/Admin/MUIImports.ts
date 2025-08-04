@@ -1,4 +1,3 @@
-// muiImports.js
 export { default as Box } from '@mui/material/Box';
 export { default as Collapse } from '@mui/material/Collapse';
 export { default as IconButton } from '@mui/material/IconButton';
@@ -12,4 +11,14 @@ export { default as Typography } from '@mui/material/Typography';
 export { default as Paper } from '@mui/material/Paper';
 export { default as KeyboardArrowDownIcon } from '@mui/icons-material/KeyboardArrowDown';
 export { default as KeyboardArrowUpIcon } from '@mui/icons-material/KeyboardArrowUp';
-
+export { default as TextField } from '@mui/material/TextField'; 
+export { default as InputAdornment } from '@mui/material/InputAdornment'; 
+export { default as SearchIcon } from '@mui/icons-material/Search';
+export { default as ClearIcon} from '@mui/icons-material/Clear';
+export { default as Avatar } from '@mui/material/Avatar';
+export { default as Skeleton } from '@mui/material/Skeleton';
+export { default as Dialog } from '@mui/material/Dialog';
+export { default as DialogTitle } from '@mui/material/DialogTitle';
+export { default as CloseIcon } from '@mui/icons-material/Close';
+export { default as TablePagination } from '@mui/material/TablePagination';
+export {styled } from  '@mui/material/styles';

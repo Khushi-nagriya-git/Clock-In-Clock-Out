@@ -15,7 +15,7 @@
     "officeFabricIconFontName": "Page",
     "properties": {
       "description": "clock-in-clock-out",
-      "listName": "timer",
+      "listName": "Clock in clock out",
       "backgroundColor": "#ffffff"
     }
   }]

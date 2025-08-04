@@ -6,8 +6,6 @@ export interface InOutDetail {
   status: string;
 }
 
-
-
 export interface DetailRecord {
   currentDate: {
     username: string;
@@ -19,12 +17,14 @@ export interface DetailRecord {
     inOutDetails: InOutDetail[];
   };
 }
+
 export type DetailRecords = DetailRecord[];
 
 export interface UserData {
   EmployeeID: string;
   EmployeeName: string;
   Date: string;
+  Email:string;
   Status: string;
   TodayTotalTime: number;
   TodayFirstIn: string;
@@ -48,22 +48,23 @@ const initialUserDataArray: UserData[] = [
     EmployeeID: "",
     EmployeeName: "",
     Date: "",
+    Email:"",
     Status: "",
     TodayTotalTime: 0,
     TodayFirstIn: "",
     TodayLastOut: "",
-    January: "[]",
-    February: "[]",
-    March: "[]",
-    April: "[]",
-    May: "[]",
-    June: "[]",
-    July: "[]",
-    August: "[]",
-    September: "[]",
-    October: "[]",
-    November: "[]",
-    December: "[]",
+    January: "",
+    February: "",
+    March: "",
+    April: "",
+    May: "",
+    June: "",
+    July: "",
+    August: "",
+    September: "",
+    October: "",
+    November: "",
+    December: "",
   }
 ];
 

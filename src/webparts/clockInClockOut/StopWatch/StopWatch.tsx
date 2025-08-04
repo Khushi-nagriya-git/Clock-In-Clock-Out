@@ -8,7 +8,7 @@ import { Scrollbar } from "react-scrollbars-custom";
 import { totalTime, formatTime, formatTimeFromTimestamp, calculateIntervalTime } from "./TimeCalculation";
 import { getCurrentUserData, getListData, addUserRecords, updateUserRecords } from "../services/services";
 import { CurrentUserDetails, UserData, initialState } from "./IStopWatchStats";
-import { Container,Box} from "@mui/material";
+import { Container, Box } from "@mui/material";
 
 const StopWatch: React.FunctionComponent<IStopWatchProps> = (
   props: IStopWatchProps
@@ -21,16 +21,15 @@ const StopWatch: React.FunctionComponent<IStopWatchProps> = (
   const [todayLoggedRecords, setTodayLoggedRecords] = useState<any[]>(initialState.todayLoggedRecords);
   const [currentUserDetails, setCurrentUserDetails] = useState<CurrentUserDetails>(initialState.currentUserDetails);
   const [userData, setUserData] = useState<UserData>(initialState.userData);
-  const date = new Date();
-  const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  let day = daysOfWeek[date.getDay()]; // Get the day of the week
-  const currentDate  = (date.toISOString().split("T")[0])+" , " + day;
   let userRecord: any[] = [];
   let startTime = "";
   let stopTime = "";
   let loginTime = 0;
   let logOutTime = 0;
-
+  const date = new Date();
+  const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  let day = daysOfWeek[date.getDay()]; // Get the day of the week
+  const currentDate = (date.toISOString().split("T")[0]) + " , " + day;
   useEffect(() => {
     (async () => {
       const userData = await getCurrentUserData(props.spHttpClient, props.absoluteURL);
@@ -63,12 +62,39 @@ const StopWatch: React.FunctionComponent<IStopWatchProps> = (
 
   useEffect(() => {
     if (currentUserDetails.Id !== 0) {
-      getListData(props.spHttpClient, props.absoluteURL,props.listName,currentUserDetails,currentDate,setUserData,setStatus, setTodayLoggedRecords,setTime,totalTime );
+      getListData(props.spHttpClient, props.absoluteURL, props.listName, currentUserDetails, currentDate, setUserData, setStatus, setTodayLoggedRecords, setTime, totalTime);
     }
   }, [currentUserDetails, props.listName]);
 
+
+  function is12HourFormat(time) {
+    return time.toUpperCase().includes('AM') || time.toUpperCase().includes('PM');
+}
+
+function padZero(num) {
+  return num < 10 ? '0' + num : num;
+}
+
+function convertTo12HourFormat(time24) {
+    let [hours, minutes, seconds] = time24.split(':').map(Number);
+    let period = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    let formattedHours = padZero(hours);
+    let formattedMinutes = padZero(minutes);
+    let formattedSeconds = padZero(seconds);
+    return `${formattedHours}:${formattedMinutes}:${formattedSeconds} ${period}`;
+}
+
+function convertTime(time) {
+    if (is12HourFormat(time)) {
+        return time;
+    } else {
+        return convertTo12HourFormat(time);
+    }
+}
+
   const startStopWatch = () => {
-    startTime = new Date().toLocaleTimeString();
+    startTime = convertTime(new Date().toLocaleTimeString());
     setCheckInTime(startTime);
     loginTime = new Date().getTime();
     setIsRunning(true);
@@ -77,7 +103,7 @@ const StopWatch: React.FunctionComponent<IStopWatchProps> = (
   };
 
   const stopStopWatch = () => {
-    stopTime = new Date().toLocaleTimeString();
+    stopTime = convertTime(new Date().toLocaleTimeString());
     logOutTime = new Date().getTime();
     setStatus("OUT");
     editUserDetails();
@@ -104,16 +130,16 @@ const StopWatch: React.FunctionComponent<IStopWatchProps> = (
           const months = [
             "January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"
-        ];    
-        const currentMonthIndex = new Date().getMonth();
-        let currentMonthName = months[currentMonthIndex];
+          ];
+          const currentMonthIndex = new Date().getMonth();
+          let currentMonthName = months[currentMonthIndex];
           if (currentUserRecord) {
             currentUserRecord[currentMonthName] = JSON.parse(
               currentUserRecord[currentMonthName]
             );
             const currentMonthData = currentUserRecord[currentMonthName];
             let todayData = find.find(currentMonthData, (obj) =>
-            find.has(obj, currentDate)
+              find.has(obj, currentDate)
             );
             if (todayData) {
               if (currentUserRecord.Status === "IN") {
@@ -206,8 +232,7 @@ const StopWatch: React.FunctionComponent<IStopWatchProps> = (
               currentUserRecord.Date = currentDate;
               currentUserRecord.Status = "IN";
               currentUserRecord.TodayFirstIn = startTime;
-              if(currentUserRecord[currentMonthName] === null){currentUserRecord[currentMonthName]=userRecord}else{ currentUserRecord[currentMonthName].push(...userRecord)}
-              // currentUserRecord[currentMonthName].push(...userRecord)
+              if (currentUserRecord[currentMonthName] === null) { currentUserRecord[currentMonthName] = userRecord } else { currentUserRecord[currentMonthName].push(...userRecord) }
               await updateUserRecords(
                 props.spHttpClient,
                 props.absoluteURL,
@@ -252,73 +277,80 @@ const StopWatch: React.FunctionComponent<IStopWatchProps> = (
       console.error("Error in service:", error);
     }
   }
-  
+
   return (
-    <Container>
-    <Box className={styles.StopWatch}>
-      <Box className={styles.main}>
-        <Box className={styles.Header}>
-          <img src={require("../assets/timer.png")} className={styles.clockIocn} />
-          <p className={styles.webpartTitle}>My Time</p>
-        </Box>
-        <Box className={styles.inOutDetails}>
-          {(!isRunning && !timer && status === "OUT") && (
-            <>
-              <Box className={styles.totalTime}>
-                <p className={styles.time}>{formatTime(timer)}</p>
-              </Box>
-              <Box className={styles.clockedInTime}>
-                <p className={styles.data}>
-                  Clocked Out: {userData.Date === currentDate ? "Today" : "Yesterday"} at{" "}
-                  {userData.TodayLastOut ? userData.TodayLastOut.split(":")[0] + ":" + userData.TodayLastOut.split(":")[1] + " " + userData.TodayLastOut.split(" ")[1] : "0:00"}
-                </p>
-              </Box>
-              <button onClick={startStopWatch} className={styles.playButton}>
-                <img src={require("../assets/timerButton.png")} className={styles.buttonImg} />
-                <p className={styles.ClockInButtonText}>Clock In</p>
-              </button>
-            </>
-          )}
-          {status === "IN" && (
-            <>
-              <Box className={styles.totalTime}>
-                <p className={styles.time}>{formatTime(timer)}</p>
-              </Box>
-              <Box className={styles.clockedInTime}>
-                <p className={styles.data}>
-                  Clocked In: Today at {checkInTime.split(":")[0] + ":" + checkInTime.split(":")[1] + " " + checkInTime.split(" ")[1]}
-                </p>
-              </Box>
-              <button onClick={stopStopWatch} className={styles.playButton}>
-                <img src={require("../assets/stop.png")} className={styles.buttonImg} />
-                <p className={styles.ClockInButtonText}>Clock Out</p>
-              </button>
-            </>
-          )}
-        </Box>
-        <Box className={styles.records}>
-          <Box className={styles.todayTime}>
-            <p className={styles.totalTimeText}>Today - {totalTime(time)}</p>
+    <div>
+      <Box className={styles.StopWatch}>
+        <Box className={styles.main}>
+          <Box className={styles.Header}>
+            {/* <img src={require("../assets/timer.png")} className={styles.clockIocn} /> */}
+            <p className={styles.webpartTitle}>Clock In Clock Out</p>
           </Box>
-          <Box className={styles.inoutStatus}>
-            <Scrollbar className={styles.scrollBar}>
-              {todayLoggedRecords.map((list: any, i: number) => (
+          <div style={{border:"1px solid #d3d3d3" , backgroundColor: "rgb(255, 255, 255)" }}>
+            <Box className={styles.inOutDetails}>
+              {(!isRunning && !timer && status === "OUT") && (
+                <>
+                  <Box className={styles.totalTime}>
+                    <p className={styles.time}>{formatTime(timer)}</p>
+                  </Box>
+                  <Box className={styles.clockedInTime}>
+                    <p className={styles.data}>
+                      Clocked Out: {userData.Date === currentDate ? "Today" : "Yesterday"} at{" "}
+                      {userData.TodayLastOut ? userData.TodayLastOut.split(":")[0] + ":" + userData.TodayLastOut.split(":")[1] + " " + userData.TodayLastOut.split(" ")[1] : "0:00"}
+                    </p>
+                  </Box>
+                  <button onClick={startStopWatch} className={styles.playButton}>
+                    <img src={require("../assets/timerButton.png")} className={styles.buttonImg} />
+                    <p className={styles.ClockInButtonText}>Clock In</p>
+                  </button>
+                </>
+              )}
+              {status === "IN" && (
+                <>
+                  <Box className={styles.totalTime}>
+                    <p className={styles.time}>{formatTime(timer)}</p>
+                  </Box>
+                  <Box className={styles.clockedInTime}>
+                    <p className={styles.data}>
+                      Clocked In: Today at {checkInTime.split(":")[0] + ":" + checkInTime.split(":")[1] + " " + checkInTime.split(" ")[1]}
+                    </p>
+                  </Box>
+                  <button onClick={stopStopWatch} className={styles.playButton}>
+                    <img src={require("../assets/stop.png")} className={styles.buttonImg} />
+                    <p className={styles.ClockInButtonText}>Clock Out</p>
+                  </button>
+                </>
+              )}
+            </Box>
+            <Box className={styles.records}>
+              <Box className={styles.todayTime}>
+                <p className={styles.totalTimeText}>Today - {totalTime(time)}</p>
+              </Box>
+              <Box className={styles.inoutStatus}>
+                <Scrollbar className={styles.scrollBar}>
+                  {todayLoggedRecords.map((list, i) => (
                 <Box className={styles.demo} key={list.start}>
-                  <p>{formatTimeFromTimestamp(list.start)}</p>{" "}
-                  <img src={require("../assets/line.png")} className={styles.line} />
-                  <p>{list.end !== 0 ? formatTimeFromTimestamp(list.end) : "Now"}</p>
-                  <img src={require("../assets/arrow.png")} className={styles.arrow} />
-                  <p className={styles.todayTotalTime}>
-                    {i === 0 && isRunning ? formatTime(timer) : totalTime(list.Total)}
-                  </p>
-                </Box>
-              ))}
-            </Scrollbar>
-          </Box>
+                <span className={styles.time}>{formatTimeFromTimestamp(list.start)}</span>
+                <img src={require("../assets/line.png")} className={styles.line} />
+                <span className={styles.time}>
+                  {list.end !== 0 ? formatTimeFromTimestamp(list.end) : "Now"}
+                </span>
+                <img src={require("../assets/arrow.png")} className={styles.arrow} />
+                <span className={styles.todayTotalTime}>
+                  {i === 0 && isRunning ? formatTime(timer) : totalTime(list.Total)}
+                </span>
+              </Box>
+              
+                
+                  ))}
+                </Scrollbar>
+              </Box>
+            </Box>
+          </div>
+         
         </Box>
       </Box>
-    </Box>
-    </Container>
+    </div>
   );
 };
 
